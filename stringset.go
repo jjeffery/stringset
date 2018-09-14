@@ -31,18 +31,16 @@ func Add(set Set, v ...string) Set {
 	return set
 }
 
-// Add adds the values in v to the set. This function panics if set is nil.
-// Use the stringset.Add function if there is a possibility of
-// set being nil.
+// Add adds the values in v to the set. If the set is nil a new set is created.
 // Add returns set in order to support method chaining.
-func (set Set) Add(v ...string) Set {
-	if set == nil {
-		panic("nil stringset")
+func (set *Set) Add(v ...string) Set {
+	if *set == nil {
+		*set = make(Set)
 	}
 	for _, s := range v {
-		set[s] = struct{}{}
+		(*set)[s] = struct{}{}
 	}
-	return set
+	return *set
 }
 
 // Remove removes the values in v from the set.
@@ -81,6 +79,7 @@ func (set Set) Equal(other Set) bool {
 }
 
 // Values returns the values of the set as a slice of string.
+// The strings are ordered in the returned slice.
 // If the set is empty, returns nil.
 func (set Set) Values() []string {
 	if len(set) == 0 {
@@ -98,6 +97,7 @@ func (set Set) Values() []string {
 }
 
 // Join concatenates the sorted elements of set to create a single string.
+// The strings are sorted prior to concatenation.
 // The separator string sep is placed between elements in the resulting
 // string.
 func (set Set) Join(sep string) string {

@@ -67,17 +67,12 @@ func TestAdd(t *testing.T) {
 		t.Fatalf("got %d, want %d", got, want)
 	}
 
-	// force a panic by using Add method on nil set.
+	// Add method on nil set.
 	set = nil
-	defer func() {
-		if r := recover(); r != nil {
-			if got, want := r, "nil stringset"; got != want {
-				t.Errorf("got %v, want %v", got, want)
-			}
-		}
-	}()
 	set.Add("A")
-	t.Errorf("expected panic")
+	if got, want := set.Len(), 1; got != want {
+		t.Fatalf("got %d, want %d", got, want)
+	}
 }
 
 func TestRemove(t *testing.T) {
