@@ -128,16 +128,26 @@ func (set *Set) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// String implements the Stringer inteface.
+func (set Set) String() string {
+	return fmt.Sprintf("%v", set.Values())
+}
+
 // GoString implements the GoStringer inteface.
 func (set Set) GoString() string {
-	if set == nil {
-		return "nil"
-	}
-	return fmt.Sprintf("%v", set.Values())
+	const prefix = "[]string"
+	s := fmt.Sprintf("%#v", set.Values())
+	s = strings.TrimPrefix(s, prefix)
+	return "stringset.Set" + s
 }
 
 // Format implements the Formatter interface
 func (set Set) Format(f fmt.State, c rune) {
-	str := set.GoString()
+	var str string
+	if f.Flag('#') {
+		str = set.GoString()
+	} else {
+		str = set.String()
+	}
 	f.Write([]byte(str))
 }

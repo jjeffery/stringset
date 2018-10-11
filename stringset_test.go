@@ -214,37 +214,49 @@ func TestValues(t *testing.T) {
 
 func TestFormat(t *testing.T) {
 	tests := []struct {
-		set  Set
-		want string
+		set   Set
+		want  string
+		want2 string
 	}{
 		{
-			set:  nil,
-			want: "nil",
+			set:   nil,
+			want:  "[]",
+			want2: "stringset.Set(nil)",
 		},
 		{
-			set:  New(),
-			want: "[]",
+			set:   New(),
+			want:  "[]",
+			want2: "stringset.Set(nil)",
 		},
 
 		{
-			set:  New("1"),
-			want: `[1]`,
+			set:   New("1"),
+			want:  `[1]`,
+			want2: `stringset.Set{"1"}`,
 		},
 		{
-			set:  New("1a", "2b", "3c"),
-			want: `[1a 2b 3c]`,
+			set:   New("1a", "2b", "3c"),
+			want:  `[1a 2b 3c]`,
+			want2: `stringset.Set{"1a", "2b", "3c"}`,
 		},
 		{
-			set:  New("2b", "1a", "3c"),
-			want: `[1a 2b 3c]`,
+			set:   New("2b", "1a", "3c"),
+			want:  `[1a 2b 3c]`,
+			want2: `stringset.Set{"1a", "2b", "3c"}`,
 		},
 	}
 	for i, tt := range tests {
 		if got := fmt.Sprintf("%v", tt.set); got != tt.want {
 			t.Errorf("%d: got %v, want %v", i, got, tt.want)
 		}
-		if got := tt.set.GoString(); got != tt.want {
+		if got := tt.set.String(); got != tt.want {
 			t.Errorf("%d: got %v, want %v", i, got, tt.want)
+		}
+		if got := fmt.Sprintf("%#v", tt.set); got != tt.want2 {
+			t.Errorf("%d: got %v, want %v", i, got, tt.want2)
+		}
+		if got := tt.set.GoString(); got != tt.want2 {
+			t.Errorf("%d: got %v, want %v", i, got, tt.want2)
 		}
 	}
 }
@@ -340,6 +352,40 @@ func TestMarshalJSON(t *testing.T) {
 		data := []byte(`["1","2",3]`)
 		if err := json.Unmarshal(data, &set); err == nil {
 			t.Errorf("got nil, expected error")
+		}
+	}
+}
+
+func TestString(t *testing.T) {
+	tests := []struct {
+		set  Set
+		want string
+	}{
+		{
+			set:  nil,
+			want: "[]",
+		},
+		{
+			set:  New(),
+			want: "[]",
+		},
+
+		{
+			set:  New("1"),
+			want: "[1]",
+		},
+		{
+			set:  New("1a", "2b", "3c"),
+			want: "[1a 2b 3c]",
+		},
+		{
+			set:  New("2b", "1a", "3c"),
+			want: "[1a 2b 3c]",
+		},
+	}
+	for i, tt := range tests {
+		if got, want := tt.set.String(), tt.want; got != want {
+			t.Errorf("%d: got %v, want %v", i, got, want)
 		}
 	}
 }
